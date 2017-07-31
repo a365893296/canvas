@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">	
+<meta name="viewport" content="width=device-width, initial-scale=1.0">	
+	<title>canvas test</title>
+	<script src="https://unpkg.com/vue"></script>
+</head>
+<body>
+<div id="app">
+	<canvas id='canvas' 
+	width="1000"
+	height="700"
+	@mousedown ="handleMouseDown"
+	>
+	
+	</canvas>
+	<!-- <button @click="drawCanvas">draw</button> -->
+	<button @click="openImage">open Image</button>
+
+	<input 
+	id="openFile" 
+	type="file" 
+	accept="image/*"
+	@change="handleFileChange" 
+	style="display: none;"
+	multiple>
+
+	<!-- <button @click="addImage">添加图片</button> -->
+	<button @click="deleteImage">删除图片</button>
+</div>
+</body>
+
+<script type="text/javascript">
+
+	var app = new Vue({
+		el:"#app" ,
+		data :{
+			images : [] ,
+			image : null ,
+			// canvas : canvas ,
+		},
+		computed:{
+
+		},
+		methods:{
+			//打开图片
+			openImage:()=>{
+				document.getElementById('openFile').click();
+			},
+
+			handleFileChange:(e)=>{
+				var files= e.target.files || e.dataTransfer.files ;
+				app.image = files[0].name ;
+				console.log(e);
+				
+				app.drawCanvas(0 ,0);
+			},
+
+			//在canvas上画上
+			drawCanvas :(x,y)=>{
+				image.src = app.image ;
+				image.onload = ()=>{
+					context.drawImage(image,x,y) ;
+				}
+			},
+
+			//删除图片
+			deleteImage:(e)=>{
+				context.fillStyle="#eee" ;
+				context.fillRect(0,0,canvas.width,canvas.height);
+				//context.clearRect(0,0,canvas.width,canvas.height);
+			},
+
+			handleMouseDown:(e)=>{
+				var begin = {
+					x: e.pageX - canvas.offsetLeft ,
+					y: e.pageY - canvas.offsetTop
+				};
+
+				app.handleImageMove(begin.x ,begin.y);
+
+				// context.translate(begin.x , begin.y) ;
+				// app.drawCanvas();
+
+//TODO
+			},
+
+			handleImageMove:(x,y)=>{
+				console.log("x =" +x + " y="+y)
+
+				if(context.isPointInPath(x,y)){
+					
+					canvas.onmousemove =function(ev){
+
+						console.log('move')
+						var e = ev||event ;
+						var end = {
+							x: e.pageX - canvas.offsetLeft ,
+					y: e.pageY - canvas.offsetTop
+						};
+
+						context.clearRect(0,0,canvas.width,canvas.height) ;
+						app.drawCanvas(end.x ,end.y) ;
+
+					}
+
+					canvas.onmouseup =function(){
+						canvas.onmousemove=null ;
+						canvas.onmouseup = null ;
+					}
+				}
+
+
+			},
+
+			//在原有的图片上添加图片  未完成
+			addImage:()=>{
+				
+			},
+			
+			//添加文字
+			addText:()=>{
+
+			},
+
+			
+
+
+		},
+	})	
+
+	var canvas = document.getElementById('canvas');
+	var context = canvas.getContext('2d') ;
+	// var files = new FileReader() ;
+	// var files = this.files ;
+	context.fillStyle="#eee" ;
+	context.rect(0,0,1000,1000);
+	context.fill();
+	var image  = new Image() ;
+
+
+</script>
+
+<style type="text/css">
+	#canvas {
+		border:1px solid #e2e2e2;
+	}
+</style>
+
+</html>
